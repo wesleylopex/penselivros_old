@@ -3,6 +3,7 @@ import { celebrate } from "celebrate";
 
 import UsersController from "./controllers/UsersController";
 import BooksController from "./controllers/BooksController";
+import CategoriesController from "./controllers/CategoriesController";
 
 import usersValidation from "./validations/usersValidation";
 import booksValidation from "./validations/booksValidation";
@@ -12,6 +13,7 @@ import booksValidation from "./validations/booksValidation";
 const routes = express.Router();
 const usersController = new UsersController();
 const booksController = new BooksController();
+const categoriesController = new CategoriesController();
 
 // users
 routes.get("/users", usersController.index);
@@ -21,9 +23,13 @@ routes.put("/users/:id", usersController.edit);
 
 // books
 routes.get("/books", booksController.index);
+routes.get("/books/search", booksController.search);
 routes.get("/books/:id", booksController.show);
 routes.post("/books", celebrate(booksValidation), booksController.create);
 routes.put("/books/:id", booksController.edit);
 routes.delete("/books/:id", booksController.delete);
+
+// categories
+routes.get("/categories", categoriesController.index)
 
 export default routes;

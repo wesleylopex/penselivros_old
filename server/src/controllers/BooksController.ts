@@ -38,6 +38,22 @@ class BooksController {
     }
   }
 
+  // search
+  async search(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { search } = req.query;
+
+      const books = await knex("books")
+        .select("*")
+        .where("title", "ilike", `%${search}%`)
+        // .where("author", "ilike", `%${search}%`);
+
+      return res.json(books);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   // create
   async create(req: Request, res: Response, next: NextFunction) {
     try {
