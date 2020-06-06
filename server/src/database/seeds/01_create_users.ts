@@ -3,11 +3,11 @@ import Knex from "knex";
 export async function seed(knex: Knex) {
   await knex("users").insert([
     {
-      is_admin: true,
+      is_admin: false,
       name: "Wesley",
-      username: "wesley",
+      username: "teste1224",
       password: "12345678",
-      image: null,
+      image: "fake-img",
     },
   ]);
 }

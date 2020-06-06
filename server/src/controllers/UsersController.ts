@@ -1,67 +1,98 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import knex from "../database/connection";
+import bcrypt, { hash } from "bcrypt";
 
 class UsersController {
-  async index(req: Request, res: Response) {
-    const users = await knex("users").select("*");
+  // index
+  async index(req: Request, res: Response, next: NextFunction) {
+    try {
+      const users = await knex("users").select("*");
 
-    const serializedUsers = users.map((user) => {
-      return {
+      const serializedUsers = users.map((user) => {
+        return {
+          ...user,
+          image_url: `http://localhost:3333/uploads/${user.image}`,
+        };
+      });
+
+      return res.json(serializedUsers);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  // show
+  async show(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+
+      const user = await knex("users").where({ id }).first();
+
+      if (!user) return res.status(400).json({ message: "User not found" });
+
+      const serializedUser = {
         ...user,
-        image_url: `http://localhost:3333/uploads/${user.image}`,
+        image_url: `https://localhost:3333/uploads/${user.image}`,
       };
-    });
 
-    return res.json(serializedUsers);
+      return res.json(serializedUser);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async show(req: Request, res: Response) {
-    const { id } = req.params;
+  // edit
+  async edit(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { id } = req.params;
+      const { is_admin, username, password, name, image } = req.body;
 
-    const user = await knex("users").where({ id }).first();
-
-    if (!user) return res.status(400).json({ message: "User not found" });
-
-    const serializedUser = {
-      ...user,
-      image_url: `https://localhost:3333/uploads/${user.image}`,
-    };
-
-    return res.json(serializedUser);
-  }
-
-  async edit(req: Request, res: Response) {
-    const { id } = req.params;
-    const { is_admin, username, password, name, image } = req.body;
-
-    const user = await knex("users")
-      .where({ id })
-      .update({
+      const user = {
         is_admin,
         username,
         password,
         name,
         image,
-      })
-      .returning("*");
+        updated_at: new Date(),
+      };
 
-    return res.json(user);
+      if (password) {
+        const hashPassword = await bcrypt.hash(password, 10);
+        user.password = hashPassword;
+      } else delete user.password;
+
+      const savedUser = await knex("users")
+        .where({ id })
+        .update(user)
+        .returning("*");
+
+      return res.json(savedUser);
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async create(req: Request, res: Response) {
-    const { is_admin, username, password, name, image } = req.body;
+  // create
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { is_admin, username, password, name, image } = req.body;
 
-    const user = await knex("users")
-      .insert({
-        is_admin,
-        username,
-        password,
-        name,
-        image,
-      })
-      .returning("*");
+      const hashPassword = await bcrypt.hash(password, 10);
 
-    return res.json(user);
+      const user = await knex("users")
+        .insert({
+          is_admin,
+          username,
+          password: hashPassword,
+          name,
+          image,
+        })
+        .returning("*");
+
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
