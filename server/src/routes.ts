@@ -4,9 +4,12 @@ import { celebrate } from "celebrate";
 import UsersController from "./controllers/UsersController";
 import BooksController from "./controllers/BooksController";
 import CategoriesController from "./controllers/CategoriesController";
+import LoansController from "./controllers/LoansController";
 
 import usersValidation from "./validations/usersValidation";
 import booksValidation from "./validations/booksValidation";
+import categoriesValidation from "./validations/categoriesValidation";
+import loansValidation from "./validations/loansValidation";
 
 // index, show, create, update, delete
 
@@ -14,6 +17,7 @@ const routes = express.Router();
 const usersController = new UsersController();
 const booksController = new BooksController();
 const categoriesController = new CategoriesController();
+const loansController = new LoansController();
 
 // users
 routes.get("/users", usersController.index);
@@ -32,7 +36,13 @@ routes.delete("/books/:id", booksController.delete);
 // categories
 routes.get("/categories", categoriesController.index);
 routes.get("/categories/:id", categoriesController.show);
-routes.post("/categories", categoriesController.create);
+routes.post("/categories", celebrate(categoriesValidation), categoriesController.create);
 routes.put("/categories/:id", categoriesController.edit);
+
+// loans
+routes.get("/loans", loansController.index);
+routes.get("/loans/:id", loansController.show);
+routes.post("/loans", celebrate(loansValidation), loansController.create);
+routes.put("/loans/:id/finish", loansController.finish);
 
 export default routes;

@@ -35,7 +35,9 @@ class UsersController {
         image_url: `https://localhost:3333/uploads/${user.image}`,
       };
 
-      return res.json(serializedUser);
+      const loans = await knex("loans").where({ user_id: id });
+
+      return res.json({ user: serializedUser, loans });
     } catch (error) {
       next(error);
     }
