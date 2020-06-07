@@ -45,8 +45,8 @@ class BooksController {
 
       const books = await knex("books")
         .select("*")
-        .where("title", "ilike", `%${search}%`)
-        // .where("author", "ilike", `%${search}%`);
+        .where("title", "ilike", `%${search}%`);
+      // .where("author", "ilike", `%${search}%`);
 
       return res.json(books);
     } catch (error) {
@@ -57,7 +57,14 @@ class BooksController {
   // create
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { title, author, image, user_id, reserved_at } = req.body;
+      const {
+        title,
+        author,
+        image,
+        user_id,
+        reserved_at,
+        category_id,
+      } = req.body;
 
       const book = await knex("books")
         .insert({
@@ -66,10 +73,11 @@ class BooksController {
           image,
           user_id,
           reserved_at,
+          category_id,
         })
         .returning("*");
 
-      return res.json(book);
+      return res.json(book[0]);
     } catch (error) {
       next(error);
     }
@@ -102,7 +110,7 @@ class BooksController {
         })
         .returning("*");
 
-      return res.json(book);
+      return res.json(book[0]);
     } catch (error) {
       next(error);
     }

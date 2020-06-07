@@ -30,6 +30,9 @@ routes.put("/books/:id", booksController.edit);
 routes.delete("/books/:id", booksController.delete);
 
 // categories
-routes.get("/categories", categoriesController.index)
+routes.get("/categories", categoriesController.index);
+routes.get("/categories/:id", categoriesController.show);
+routes.post("/categories", categoriesController.create);
+routes.put("/categories/:id", categoriesController.edit);
 
 export default routes;
