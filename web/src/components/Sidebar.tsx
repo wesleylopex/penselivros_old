@@ -24,14 +24,16 @@ import InboxIcon from "@material-ui/icons/MoveToInbox";
 import MailIcon from "@material-ui/icons/Mail";
 import { People, Book, Bookmark, MenuBook } from "@material-ui/icons";
 
-import DataTable from "./DataTable"
+import DataTable from "./DataTable";
+import { Link } from "react-router-dom";
+import "./styles/sidebar.css"
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      display: "flex",
+      // display: "flex",
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
@@ -58,7 +60,7 @@ const useStyles = makeStyles((theme: Theme) =>
     drawer: {
       width: drawerWidth,
       flexShrink: 0,
-      whiteSpace: "nowrap",
+      whiteSpace: "nowrap"
     },
     drawerOpen: {
       width: drawerWidth,
@@ -72,6 +74,7 @@ const useStyles = makeStyles((theme: Theme) =>
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
+      backgroundColor: "#202124",
       overflowX: "hidden",
       width: theme.spacing(7) + 1,
       [theme.breakpoints.up("sm")]: {
@@ -89,12 +92,16 @@ const useStyles = makeStyles((theme: Theme) =>
     content: {
       flexGrow: 1,
       padding: theme.spacing(3),
-      marginTop: 64
+      marginLeft: theme.spacing(9) + 1
     },
   })
 );
 
-export default function MiniDrawer() {
+interface DrawerProps {
+  Content: React.FC
+}
+
+const MiniDrawer = ({Content}: DrawerProps) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
@@ -109,77 +116,40 @@ export default function MiniDrawer() {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
-        position="fixed"
-        className={clsx(classes.appBar, {
-          [classes.appBarShift]: open,
-        })}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            className={clsx(classes.menuButton, {
-              [classes.hide]: open,
-            })}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap>
-            Mini variant drawer
-          </Typography>
-        </Toolbar>
-      </AppBar>
       <Drawer
         variant="permanent"
         className={clsx(classes.drawer, {
-          [classes.drawerOpen]: open,
           [classes.drawerClose]: !open,
         })}
         classes={{
           paper: clsx({
-            [classes.drawerOpen]: open,
             [classes.drawerClose]: !open,
           }),
         }}
       >
-        <div className={classes.toolbar}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === "rtl" ? (
-              <ChevronRightIcon />
-            ) : (
-              <ChevronLeftIcon />
-            )}
-          </IconButton>
+        <div className="menu-items">
+          <Link to="/usuarios">
+            <div className="menu-item">
+              <People className="menu-item-icon" />
+            </div>
+          </Link>
+          <Link to="/livros">
+            <div className="menu-item">
+              <MenuBook className="menu-item-icon" />
+            </div>
+          </Link>
+          <Link to="/emprestimos">
+            <div className="menu-item">
+              <Bookmark className="menu-item-icon" />
+            </div>
+          </Link>
         </div>
-        <Divider />
-        <List>
-          <ListItem button>
-            <ListItemIcon>
-              <People />
-            </ListItemIcon>
-            <ListItemText primary="Usuários" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <MenuBook />
-            </ListItemIcon>
-            <ListItemText primary="Livros" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <Bookmark />
-            </ListItemIcon>
-            <ListItemText primary="Empréstimos" />
-          </ListItem>
-        </List>
       </Drawer>
       <main className={classes.content}>
-        <DataTable />
+        <Content />
       </main>
     </div>
   );
 }
+
+export default MiniDrawer
